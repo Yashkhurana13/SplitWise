@@ -12,9 +12,10 @@ const Dashboard = () => {
     apiCall('/balances').then(data => setGlobalBalances(data)).catch(() => {});
   }, []);
 
-  // Calculate totals
-  const youOwe = globalBalances.filter(b => b.fromUserId === user.id);
-  const youAreOwed = globalBalances.filter(b => b.toUserId === user.id);
+  // Calculate totals safely
+  const safeBalances = Array.isArray(globalBalances) ? globalBalances : [];
+  const youOwe = user ? safeBalances.filter(b => b.fromUserId === user.id) : [];
+  const youAreOwed = user ? safeBalances.filter(b => b.toUserId === user.id) : [];
 
   const totalOwe = youOwe.reduce((sum, b) => sum + Number(b.amount), 0);
   const totalOwed = youAreOwed.reduce((sum, b) => sum + Number(b.amount), 0);
