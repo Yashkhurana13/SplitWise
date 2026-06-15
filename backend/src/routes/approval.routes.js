@@ -71,25 +71,48 @@ router.post('/expenses/:id/approve', async (req, res) => {
       const finalAmount = overrideData?.amount || expense.amount;
       const finalTitle = overrideData?.title || expense.title;
       
-      // We must generate the ExpenseSplits here so the Balance Engine can read them.
-      // For simplicity in this demo, if EQUAL, we divide by N active members.
+      // Fix: Generate ExpenseSplits accurately based on original split type
+      const { calculateSplits } = require('../services/split.service');
       const raw = JSON.parse(expense.rawCSVRow);
       const splitNames = raw.split_with ? raw.split_with.split(';').map(s=>s.trim()) : [];
+      const splitDetailsRaw = raw.split_details ? String(raw.split_details).split(';').map(s=>s.trim()) : [];
+      const splitType = raw.split_type || 'EQUAL';
       
       const groupMembers = await prisma.groupMember.findMany({
         where: { groupId: expense.groupId },
         include: { user: true }
       });
 
-      const validMembers = groupMembers.filter(m => splitNames.some(n => n.toLowerCase() === m.user.name.toLowerCase()));
-      if (validMembers.length === 0) return res.status(400).json({ error: 'No valid members to split with' });
+      const mappedSplitDetails = splitNames.map((name, idx) => {
+        const member = groupMembers.find(m => m.user.name.toLowerCase() === name.toLowerCase());
+        if (!member) return null;
+        const detailVal = splitDetailsRaw[idx];
+        
+        const res = { userId: member.userId };
+        if (splitType === 'PERCENTAGE') res.percentage = detailVal;
+        else if (splitType === 'SHARES') res.shares = detailVal;
+        else if (splitType === 'UNEQUAL') res.amount = detailVal;
+        
+        return res;
+      });
 
-      const splitAmount = Number(finalAmount) / validMembers.length;
+      if (mappedSplitDetails.includes(null)) {
+        return res.status(400).json({ error: 'Cannot approve expense: It contains unknown or inactive members. Please reject this row or manually edit the members to assign valid registered users.' });
+      }
+
+      if (mappedSplitDetails.length === 0) return res.status(400).json({ error: 'No valid members to split with' });
+
+      let calculatedSplits = [];
+      try {
+        calculatedSplits = calculateSplits(finalAmount, splitType, mappedSplitDetails, expense.payerId);
+      } catch (err) {
+        return res.status(400).json({ error: err.message });
+      }
       
-      const splits = validMembers.map(m => ({
+      const splits = calculatedSplits.map(s => ({
         expenseId: expense.id,
-        userId: m.userId,
-        amountOwed: splitAmount
+        userId: s.userId,
+        amountOwed: s.amountOwed
       }));
 
       await prisma.$transaction([
