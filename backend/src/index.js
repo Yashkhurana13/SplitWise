@@ -9,7 +9,7 @@ const importRoutes = require('./routes/import.routes');
 const approvalRoutes = require('./routes/approval.routes');
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: 'https://splitwise.yashkhurana.dev', credentials: true }));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

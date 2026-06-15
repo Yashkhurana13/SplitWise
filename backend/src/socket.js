@@ -3,7 +3,7 @@ const prisma = require('./utils/prisma');
 
 const initializeSocket = (server) => {
   const io = new Server(server, {
-    cors: { origin: '*' }
+    cors: { origin: 'https://splitwise.yashkhurana.dev', credentials: true }
   });
 
   io.on('connection', (socket) => {
