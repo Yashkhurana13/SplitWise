@@ -19,7 +19,7 @@ const GroupDetails = () => {
 
   const fetchGroupData = () => {
     apiCall(`/groups/${id}`).then(data => setGroup(data)).catch(()=>{});
-    apiCall(`/groups/${id}/balances`).then(data => setBalances(data)).catch(()=>{});
+    apiCall(`/groups/${id}/balances`).then(data => setBalances(Array.isArray(data) ? data : [])).catch(()=>{});
   };
 
   const handleFileUpload = async (e) => {
@@ -59,6 +59,8 @@ const GroupDetails = () => {
   if (!group) return <div className="p-8 text-gray-500">Loading...</div>;
 
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const safeExpenses = Array.isArray(group.expenses) ? group.expenses : [];
+  const safeBalances = Array.isArray(balances) ? balances : [];
 
   return (
     <div className="flex h-full w-full font-sans">
@@ -79,26 +81,28 @@ const GroupDetails = () => {
               </span>
               <input type="file" accept=".csv" className="hidden" onChange={handleFileUpload} disabled={isUploading} />
             </label>
-            <Button className="bg-debt hover:bg-debt-dark text-white font-semibold shadow-sm">Add an expense</Button>
+            <Link to={`/groups/${id}/expenses/create`}>
+              <Button className="bg-debt hover:bg-debt-dark text-white font-semibold shadow-sm">Add an expense</Button>
+            </Link>
             <Button onClick={() => setIsSettleModalOpen(true)} className="bg-brand hover:bg-brand-dark text-white font-semibold shadow-sm">Settle up</Button>
           </div>
         </div>
 
         {/* Expense Feed */}
         <div className="flex flex-col">
-          {group.expenses?.length === 0 ? (
+          {safeExpenses.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               <img src="https://assets.splitwise.com/assets/fat_rabbit/empty-table-light-27464010cb7c64c24ccb50a260840ff719a6200236aeeae4472f8ff160ed013b.png" alt="Empty" className="w-32 mx-auto mb-4 opacity-50" />
               <p>No expenses here yet.</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
-              {group.expenses?.map(exp => {
+              {safeExpenses.map(exp => {
                 const date = new Date(exp.createdAt);
                 
                 // Calculate "You borrowed / You lent"
-                const isPayer = exp.payerId === user.id;
-                let userSplit = exp.splits.find(s => s.userId === user.id);
+                const isPayer = user && exp.payerId === user.id;
+                let userSplit = user ? exp.splits.find(s => s.userId === user.id) : null;
                 
                 let balanceImpact = null;
                 if (isPayer && userSplit) {
@@ -158,11 +162,11 @@ const GroupDetails = () => {
       {/* Right Sidebar (Members & Balances) */}
       <div className="w-64 bg-graybg p-4 flex-shrink-0">
         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Group balances</h3>
-        {balances.length === 0 ? (
+        {safeBalances.length === 0 ? (
           <p className="text-sm text-gray-500">Everyone is settled up!</p>
         ) : (
           <ul className="space-y-4">
-            {balances.map((b, i) => (
+            {safeBalances.map((b, i) => (
               <li key={i} className="flex items-start space-x-3">
                 <img src={`https://ui-avatars.com/api/?name=${b.fromUserName}&background=ddd&color=555`} className="w-8 h-8 rounded-full" />
                 <div className="text-sm leading-tight">
