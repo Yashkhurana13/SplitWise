@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5001/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const apiCall = async (endpoint, options = {}) => {
   const authData = JSON.parse(localStorage.getItem('splitwise_auth') || 'null');
