@@ -32,7 +32,8 @@ const GroupDetails = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5001/api/import/${id}`, {
+      const API_URL = import.meta.env.VITE_API_URL || '/api';
+      const res = await fetch(`${API_URL}/import/${id}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
