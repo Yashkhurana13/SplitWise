@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { apiCall } from '../../lib/api';
-import { useAuth } from '../../context/AuthContext';
+import { apiCall } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
