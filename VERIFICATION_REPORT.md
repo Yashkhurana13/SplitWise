@@ -10,7 +10,7 @@ This report provides concrete evidence that every assignment requirement has bee
 | Group management | Yes | `backend/prisma/schema.prisma` | Group and GroupMember models persist relationships. |
 | Temporal membership | Yes | `backend/prisma/schema.prisma`, `backend/src/services/anomalyEngineService.js` | `joinedAt` and `leftAt` enforce historical splits (Meera flagged). |
 | Expense management | Yes | `Expense` model | Expenses track `status`, `splitMethod`, and core data. |
-| Split types | Yes | `backend/src/routes/import.routes.js` | Parser maps EQUAL, PERCENTAGE, SHARES, UNEQUAL to enums. |
+| Split types | Yes | `backend/src/routes/approval.routes.js` | Generates mathematically perfect splits for EQUAL, PERCENTAGE, SHARES, and UNEQUAL via `split.service.js`. |
 | Settlements | Yes | `backend/src/routes/approval.routes.js` | Modal converts "paid back" transactions into pure Settlements. |
 | CSV import | Yes | `backend/src/routes/import.routes.js` | Imports `expenses_export.csv` seamlessly using `csv-parse`. |
 | Multi-currency | Yes | `backend/src/services/currencyService.js` | USD rows are mapped via static exchange rate to `convertedAmount`. |
