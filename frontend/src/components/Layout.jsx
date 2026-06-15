@@ -87,7 +87,10 @@ const Layout = () => {
                 onClick={async () => {
                   try {
                     const { apiCall } = await import('../lib/api');
-                    const res = await apiCall('/groups', 'POST', { name: 'New Goa Trip', currency: 'INR' });
+                    const res = await apiCall('/groups', {
+                      method: 'POST', 
+                      body: JSON.stringify({ name: 'New Goa Trip', currency: 'INR' })
+                    });
                     window.location.href = `/groups/${res.id}`;
                   } catch (e) {
                     alert('Failed to create group');
