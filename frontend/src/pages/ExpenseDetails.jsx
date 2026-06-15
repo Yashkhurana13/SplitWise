@@ -29,7 +29,7 @@ const ExpenseDetails = () => {
     apiCall(`/expenses/${id}/messages`).then(data => setMessages(data));
 
     // Connect socket
-    socketRef.current = io('http://localhost:5001');
+    socketRef.current = io(import.meta.env.VITE_SOCKET_URL || window.location.origin);
     socketRef.current.emit('join-expense', id);
 
     socketRef.current.on('message-received', (msg) => {

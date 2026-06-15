@@ -19,7 +19,7 @@ const ExpenseDetailsModal = ({ expense, onClose }) => {
     apiCall(`/expenses/${expense.id}/messages`).then(data => setMessages(data)).catch(()=>{});
 
     // Connect socket
-    socketRef.current = io('http://localhost:5001');
+    socketRef.current = io(import.meta.env.VITE_SOCKET_URL || window.location.origin);
     socketRef.current.emit('join-expense', expense.id);
 
     socketRef.current.on('message-received', (msg) => {
