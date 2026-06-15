@@ -1,7 +1,36 @@
-import React from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '@/components/ui/button';
+import { apiCall } from '../lib/api';
+
+const GroupsList = () => {
+  const [groups, setGroups] = useState([]);
+  const location = useLocation();
+
+  useEffect(() => {
+    apiCall('/groups').then(setGroups).catch(() => {});
+  }, []);
+
+  if (!groups.length) return <div className="px-3 text-sm text-gray-500 italic">No groups yet</div>;
+
+  return (
+    <>
+      {groups.map(g => (
+        <Link 
+          key={g.id} 
+          to={`/groups/${g.id}`} 
+          className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+            location.pathname === `/groups/${g.id}` ? 'bg-brand-light text-brand-dark' : 'text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          <span>🏕️</span>
+          <span className="truncate">{g.name}</span>
+        </Link>
+      ))}
+    </>
+  );
+};
 
 const Layout = () => {
   const { user, logout } = useAuth();
@@ -53,10 +82,22 @@ const Layout = () => {
           <div className="pt-4">
             <div className="flex items-center justify-between px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
               <span>Groups</span>
-              <button className="text-gray-400 hover:text-brand">+ add</button>
+              <button 
+                className="text-gray-400 hover:text-brand"
+                onClick={async () => {
+                  try {
+                    const { apiCall } = await import('../lib/api');
+                    const res = await apiCall('/groups', 'POST', { name: 'New Goa Trip', currency: 'INR' });
+                    window.location.href = `/groups/${res.id}`;
+                  } catch (e) {
+                    alert('Failed to create group');
+                  }
+                }}
+              >+ add</button>
             </div>
-            {/* We will populate groups here dynamically or leave it as a placeholder for layout */}
-            <div className="px-3 text-sm text-gray-500 italic">Groups populate on Dashboard</div>
+            <div className="space-y-1">
+              <GroupsList />
+            </div>
           </div>
         </aside>
 

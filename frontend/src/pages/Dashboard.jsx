@@ -28,8 +28,8 @@ const Dashboard = () => {
       <div className="bg-graybg px-6 py-4 flex justify-between items-center border-b border-gray-200 shadow-[inset_0_1px_0_rgba(255,255,255,1)]">
         <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Dashboard</h1>
         <div className="flex space-x-3">
-          <Button className="bg-debt hover:bg-debt-dark text-white font-semibold shadow-sm">Add an expense</Button>
-          <Button className="bg-brand hover:bg-brand-dark text-white font-semibold shadow-sm">Settle up</Button>
+          <Button onClick={() => alert("Select a group from the sidebar to add expenses.")} className="bg-debt hover:bg-debt-dark text-white font-semibold shadow-sm">Add an expense</Button>
+          <Button onClick={() => alert("Select a group from the sidebar to settle up.")} className="bg-brand hover:bg-brand-dark text-white font-semibold shadow-sm">Settle up</Button>
         </div>
       </div>
 
