@@ -32,3 +32,8 @@
 * **Problem:** Misclassified settlements or 110% math errors break accounting rules.
 * **Chosen Option:** No imported expense alters the live ledger until `status` = `APPROVED`.
 * **Reasoning:** Fulfills the "Explicit User Consent" requirement.
+
+## 5. Unified Split Calculation Logic
+* **Problem:** The `approval.routes.js` and `expense.controller.js` both need to generate `ExpenseSplits` from complex inputs (EQUAL, PERCENTAGE, SHARES, UNEQUAL).
+* **Chosen Option:** Consolidate all math into `calculateSplits` within `split.service.js` and consume it in both routes.
+* **Reasoning:** Prevents duplicated business logic and ensures that CSV imports follow the exact same rounding and remainder absorption rules as manually created expenses.

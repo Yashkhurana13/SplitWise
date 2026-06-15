@@ -55,7 +55,7 @@ Users can easily record shared expenses and instantly understand who owes whom a
 
 **Key Decisions:**
 * **Expenses & Payers:** Single payer per expense to simplify calculations and workflows.
-* **Expense Splits:** Use a dedicated `ExpenseSplits` table to store exact calculated amounts for all split types.
+* **Expense Splits:** Use a dedicated `ExpenseSplits` table to store exact calculated amounts for all split types. The logic is strictly unified under `split.service.js` which guarantees consistent math for both manual creation and CSV approvals.
 * **Settlements:** Dedicated `Settlements` table distinct from expenses.
 * **Expense Schema Improvements:** Included `title` (required), `description` (optional), and a strict `SplitMethod` enum for type safety.
 * **Financial Data:** All monetary values are stored as `Decimal(10,2)`. Business logic rounds values to two decimal places before persistence. Floating-point storage is avoided for financial correctness.
